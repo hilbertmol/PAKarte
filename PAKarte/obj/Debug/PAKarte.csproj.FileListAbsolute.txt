@@ -1,0 +1,13 @@
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\bin\Debug\PAKarte.exe.config
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\bin\Debug\PAKarte.exe
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\bin\Debug\PAKarte.pdb
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.csproj.AssemblyReference.cache
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.Properties.Resources.resources
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.csproj.GenerateResource.cache
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.csproj.CoreCompileInputs.cache
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.exe
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.pdb
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.frmHaltestellenKarte.resources
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.frmHauptmenue.resources
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.frmHaltestellenCSV.resources
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.frmHaltestellenDB.resources
