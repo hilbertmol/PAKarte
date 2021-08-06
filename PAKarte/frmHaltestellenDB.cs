@@ -22,7 +22,6 @@ namespace PAKarte
         private BackgroundWorker worker = new BackgroundWorker();
         private string dirCSV = @"C:\Temp\Haltestellen.csv";
         private string dirDB = @"C:\Temp\HaltestellenDB.accdb";
-        private const int len = 6598;
 
         private void UpdateBindingDataSource()
         {
@@ -104,7 +103,7 @@ namespace PAKarte
 
                 if (prgbLoad.Value == 100)
                 {
-                    DialogResult res = MessageBox.Show("Datei geladen", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult res = MessageBox.Show("Datei geladen.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     if (res == DialogResult.OK)
                     {
                         dgvHaltestellen.Refresh();
@@ -143,6 +142,8 @@ namespace PAKarte
             OleDbCommand cmd2 = new OleDbCommand();
             btnHaltestellenDBSchreiben.Enabled = false;
 
+            int cntCells = 0;
+
             foreach (string line in values.Skip(1))
             {
                 var splittedLine = line.Split(';');
@@ -153,18 +154,22 @@ namespace PAKarte
 
                 HaltestellenDaten hlt = new HaltestellenDaten(nr, name, laenge, breite);
                 data.Add(hlt);
+                cntCells++;
             }
 
             con.ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;" +
                                     "Data Source=" + dirDB;
-            cmd2.Connection = con;
             cmd1.Connection = con;
+            cmd2.Connection = con;
+
+            int cnt = 0;
 
             try
             {
                 con.Open();
                 cmd1.CommandText = "delete * from D_Bahnhof_2016_01_alle_CSharpImport";
                 cmd1.ExecuteNonQuery();
+
                 foreach (HaltestellenDaten hlt in data)
                 {
                     cmd2.CommandText = "insert into D_Bahnhof_2016_01_alle_CSharpImport" +
@@ -174,6 +179,16 @@ namespace PAKarte
                     "'" + hlt.Laenge + "'," +
                     "'" + hlt.Breite + "')";
                     cmd2.ExecuteNonQuery();
+                    prgbLoad.Value = (int)(cnt + 1) * 100 / cntCells;
+                    lblProgress.Text = prgbLoad.Value.ToString() + "%";
+                    lblProgress.Refresh();
+                    cnt++;
+                }
+                if (prgbLoad.Value == 100)
+                {
+                    DialogResult res = MessageBox.Show("Daten wurden in DB gespeichert.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    prgbLoad.Value = 0;
+                    lblProgress.Text = prgbLoad.Value.ToString() + "%";
                 }
             }
             catch (Exception ex)
