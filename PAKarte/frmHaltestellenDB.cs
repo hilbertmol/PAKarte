@@ -17,10 +17,6 @@ namespace PAKarte
         public frmHaltestellenDB()
         {
             InitializeComponent();
-            worker.WorkerSupportsCancellation = true;
-            worker.WorkerReportsProgress = true;
-            worker.ProgressChanged += Worker_ProgressChanged;
-            worker.DoWork += DBLoad;
         }
 
         private BackgroundWorker worker = new BackgroundWorker();
@@ -28,13 +24,24 @@ namespace PAKarte
         private string dirDB = @"C:\Temp\HaltestellenDB.accdb";
         private const int len = 6598;
 
+        private void UpdateBindingDataSource()
+        {
+            using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;" +
+                "Data Source=" + dirDB))
+            {
+                con.Open();
+                string cmdStr = "select * from D_Bahnhof_2016_01_alle_CSharpImport";
+                OleDbDataAdapter da = new OleDbDataAdapter(cmdStr, con);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                dgvHaltestellen.DataSource = dt;
+            }
+        }
         private void btnDatenladen_Click(object sender, EventArgs e)
         {
-            worker.RunWorkerAsync();
-        }
+            dgvHaltestellen.Rows.Clear();
+            dgvHaltestellen.Columns.Clear();
 
-        private void DBLoad(object sender, DoWorkEventArgs e)
-        {
             dgvHaltestellen.RowsDefaultCellStyle.BackColor = Color.LightCoral;
             dgvHaltestellen.AlternatingRowsDefaultCellStyle.BackColor = Color.LightGray;
             dgvHaltestellen.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
@@ -88,13 +95,24 @@ namespace PAKarte
                     double breite = (double)reader["Breite"];
 
                     dgvHaltestellen.Rows.Add(nr, name, laenge, breite);
-                    worker.ReportProgress((int)(cnt + 1) * 100 / cntCells);
+                    prgbLoad.Value = (int)(cnt + 1) * 100 / cntCells; 
+                    lblProgress.Text = prgbLoad.Value.ToString() + "%";
+                    lblProgress.Refresh();
                     cnt++;
-                    dgvHaltestellen.Refresh();
+                    dgvHaltestellen.Update();
                 }
-                Application.DoEvents();
-                btnDatenladen.Enabled = true;
 
+                if (prgbLoad.Value == 100)
+                {
+                    DialogResult res = MessageBox.Show("Datei geladen", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (res == DialogResult.OK)
+                    {
+                        dgvHaltestellen.Refresh();
+                        btnDatenladen.Enabled = true;
+                        prgbLoad.Value = 0;
+                    }
+                    lblProgress.Text = prgbLoad.Value.ToString() + "%";
+                }
                 reader.Close();
                 con.Close();
             }
@@ -164,22 +182,6 @@ namespace PAKarte
                 con.Close();
             }
             btnHaltestellenDBSchreiben.Enabled = true;
-        }
-
-        private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            prgbLoad.Value = e.ProgressPercentage;
-            lblProgress.Text = e.ProgressPercentage.ToString() + "%";
-
-            if (prgbLoad.Value == 100)
-            {
-                DialogResult res = MessageBox.Show("Datei geladen", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                if (res == DialogResult.OK)
-                {
-                    prgbLoad.Value = 0;
-                }
-                lblProgress.Text = prgbLoad.Value.ToString() + "%";
-            }
         }
     }
 }
