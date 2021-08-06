@@ -33,6 +33,8 @@ namespace PAKarte
             this.dgvHaltestellen = new System.Windows.Forms.DataGridView();
             this.lblUeberschriftHaltestellen = new System.Windows.Forms.Label();
             this.btnDatenladen = new System.Windows.Forms.Button();
+            this.lblProgress = new System.Windows.Forms.Label();
+            this.prgbLoad = new System.Windows.Forms.ProgressBar();
             ((System.ComponentModel.ISupportInitialize)(this.dgvHaltestellen)).BeginInit();
             this.SuspendLayout();
             // 
@@ -89,11 +91,30 @@ namespace PAKarte
             this.btnDatenladen.UseVisualStyleBackColor = true;
             this.btnDatenladen.Click += new System.EventHandler(this.btnDatenladen_Click);
             // 
+            // lblProgress
+            // 
+            this.lblProgress.AutoSize = true;
+            this.lblProgress.BackColor = System.Drawing.SystemColors.Control;
+            this.lblProgress.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblProgress.Location = new System.Drawing.Point(327, 730);
+            this.lblProgress.Name = "lblProgress";
+            this.lblProgress.Size = new System.Drawing.Size(0, 20);
+            this.lblProgress.TabIndex = 68;
+            // 
+            // prgbLoad
+            // 
+            this.prgbLoad.Location = new System.Drawing.Point(37, 668);
+            this.prgbLoad.Name = "prgbLoad";
+            this.prgbLoad.Size = new System.Drawing.Size(589, 48);
+            this.prgbLoad.TabIndex = 67;
+            // 
             // frmHaltestellenCSV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1611, 873);
+            this.Controls.Add(this.lblProgress);
+            this.Controls.Add(this.prgbLoad);
             this.Controls.Add(this.btnDatenladen);
             this.Controls.Add(this.lblUeberschriftHaltestellen);
             this.Controls.Add(this.dgvHaltestellen);
@@ -105,6 +126,7 @@ namespace PAKarte
             this.Load += new System.EventHandler(this.frmHaltestellenDB_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvHaltestellen)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -114,5 +136,7 @@ namespace PAKarte
         private System.Windows.Forms.DataGridView dgvHaltestellen;
         private System.Windows.Forms.Label lblUeberschriftHaltestellen;
         private System.Windows.Forms.Button btnDatenladen;
+        private System.Windows.Forms.Label lblProgress;
+        private System.Windows.Forms.ProgressBar prgbLoad;
     }
 }

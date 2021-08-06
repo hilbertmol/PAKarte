@@ -18,7 +18,7 @@ namespace PAKarte
             InitializeComponent();
         }
 
-        private string dir = @"C:\TEMP\Haltestellen.csv";
+        private static string dir = @"C:\TEMP\Haltestellen.csv";
 
         private void frmHaltestellenDB_Load(object sender, EventArgs e)
         {
@@ -41,6 +41,9 @@ namespace PAKarte
             List<HaltestellenDaten> data = new List<HaltestellenDaten>();
             btnDatenladen.Enabled = false;
 
+            int cntCells = File.ReadAllLines(dir).Length - 1;
+            int cnt = 0;
+
             foreach (string line in values.Skip(1))
             {
                 var splittedLine = line.Split(';');
@@ -51,10 +54,20 @@ namespace PAKarte
 
                 HaltestellenDaten hlt = new HaltestellenDaten(nr, name, laenge, breite);
                 data.Add(hlt);
+                prgbLoad.Value = (int)(cnt + 1) * 100 / cntCells;
+                lblProgress.Text = prgbLoad.Value.ToString() + "%";
+                lblProgress.Refresh();
+                cnt++;
             }
 
-            dgvHaltestellen.DataSource = data;
-            btnDatenladen.Enabled = true;
+            if (prgbLoad.Value == 100)
+            {
+                prgbLoad.Value = 0;
+                lblProgress.Text = prgbLoad.Value.ToString() + "%";
+                lblProgress.Refresh();
+                dgvHaltestellen.DataSource = data;
+                btnDatenladen.Enabled = true;
+            }
         }
 
         private void frmHaltestellenCSV_FormClosing(object sender, FormClosingEventArgs e)
