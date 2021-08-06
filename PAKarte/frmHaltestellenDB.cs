@@ -139,7 +139,8 @@ namespace PAKarte
             string[] values = File.ReadAllLines(dirCSV);
             List<HaltestellenDaten> data = new List<HaltestellenDaten>();
             OleDbConnection con = new OleDbConnection();
-            OleDbCommand cmd = new OleDbCommand();
+            OleDbCommand cmd1 = new OleDbCommand();
+            OleDbCommand cmd2 = new OleDbCommand();
             btnHaltestellenDBSchreiben.Enabled = false;
 
             foreach (string line in values.Skip(1))
@@ -156,20 +157,23 @@ namespace PAKarte
 
             con.ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;" +
                                     "Data Source=" + dirDB;
-            cmd.Connection = con;
+            cmd2.Connection = con;
+            cmd1.Connection = con;
+
             try
             {
                 con.Open();
-
+                cmd1.CommandText = "delete * from D_Bahnhof_2016_01_alle_CSharpImport";
+                cmd1.ExecuteNonQuery();
                 foreach (HaltestellenDaten hlt in data)
                 {
-                    cmd.CommandText = "insert into D_Bahnhof_2016_01_alle_CSharpImport" +
+                    cmd2.CommandText = "insert into D_Bahnhof_2016_01_alle_CSharpImport" +
                     "(eva_nr, name, laenge, breite) values(" +
                     "'" + hlt.NR + "'," +
                     "'" + hlt.Name + "'," +
                     "'" + hlt.Laenge + "'," +
                     "'" + hlt.Breite + "')";
-                    cmd.ExecuteNonQuery();
+                    cmd2.ExecuteNonQuery();
                 }
             }
             catch (Exception ex)
