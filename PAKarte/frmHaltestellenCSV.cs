@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,7 @@ namespace PAKarte
         public frmHaltestellenCSV()
         {
             InitializeComponent();
+            dgvHaltestellen.ReadOnly = true;
         }
 
         private static string dir = @"C:\TEMP\Haltestellen.csv";
@@ -62,11 +64,16 @@ namespace PAKarte
 
             if (prgbLoad.Value == 100)
             {
+                lblProgress.Refresh();
                 prgbLoad.Value = 0;
                 lblProgress.Text = prgbLoad.Value.ToString() + "%";
                 lblProgress.Refresh();
+                //hier wird nicht wie bei der frmHaltestellenDB zeilenweise in DataGridView geschrieben,
+                //sondern direkt über die Anbindung an die Liste - nachdem Daten geladen werden, gibt es Verzögerung (wegen dem Refresh)
                 dgvHaltestellen.DataSource = data;
+                dgvHaltestellen.Refresh();
                 btnDatenladen.Enabled = true;
+                DialogResult res = MessageBox.Show("Datei geladen", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 

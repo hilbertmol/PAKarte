@@ -17,6 +17,8 @@ namespace PAKarte
         public frmHaltestellenDB()
         {
             InitializeComponent();
+            dgvHaltestellen.ReadOnly = true;
+            rdbEVANR.Checked = true;
         }
 
         private BackgroundWorker worker = new BackgroundWorker();
@@ -201,6 +203,20 @@ namespace PAKarte
                 con.Close();
             }
             btnHaltestellenDBSchreiben.Enabled = true;
+        }
+
+        private void btnSortierenAufst_Click(object sender, EventArgs e)
+        {
+            btnSortierenAufst.Enabled = false;
+            dgvHaltestellen.Sort(new GridSort(SortOrder.Ascending, rdbEVANR.Checked ? 0 : 1));
+            btnSortierenAufst.Enabled = true;
+        }
+
+        private void btnSortiereAbst_Click(object sender, EventArgs e)
+        {
+            btnSortierenAufst.Enabled = false;
+            dgvHaltestellen.Sort(new GridSort(SortOrder.Descending, rdbEVANR.Checked ? 0 : 1));
+            btnSortierenAufst.Enabled = true;
         }
     }
 }
