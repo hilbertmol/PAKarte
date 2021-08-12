@@ -214,9 +214,9 @@ namespace PAKarte
 
         private void btnSortiereAbst_Click(object sender, EventArgs e)
         {
-            btnSortierenAufst.Enabled = false;
+            btnSortiereAbst.Enabled = false;
             dgvHaltestellen.Sort(new GridSort(SortOrder.Descending, rdbEVANR.Checked ? 0 : 1));
-            btnSortierenAufst.Enabled = true;
+            btnSortiereAbst.Enabled = true;
         }
     }
 }

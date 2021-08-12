@@ -11,3 +11,5 @@ C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.frmHaltestellenKa
 C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.frmHauptmenue.resources
 C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.frmHaltestellenCSV.resources
 C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.frmHaltestellenDB.resources
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\bin\Debug\Gma.System.MouseKeyHook.dll
+C:\Users\lukasz\Source\Repos\PAKarte\PAKarte\obj\Debug\PAKarte.csproj.CopyComplete

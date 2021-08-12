@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using Gma.System.MouseKeyHook;
 
 namespace PAKarte
 {
@@ -21,6 +22,8 @@ namespace PAKarte
             worker.WorkerReportsProgress = true;
             worker.ProgressChanged += Worker_ProgressChanged;
             worker.DoWork += CSVLoad;
+            Subscribe();
+            FormClosing += Main_Closing;
         }
 
         private string dir = @"C:\TEMP\Haltestellen.csv";
@@ -28,9 +31,61 @@ namespace PAKarte
         private double hy;
         private double minLaenge = Double.MaxValue, maxLaenge = Double.MinValue;
         private double minBreite = Double.MaxValue, maxBreite = Double.MinValue;
-
+        private Dictionary<Point, string> dictPntOrt = new Dictionary<Point, string>();
         private BackgroundWorker worker = new BackgroundWorker();
         private const int len = 6598;
+        private IKeyboardMouseEvents m_GlobalHook;
+
+        public void Subscribe()
+        {
+            // Note: for the application hook, use the Hook.AppEvents() instead
+            //m_GlobalHook = Hook.GlobalEvents();
+            m_GlobalHook = Hook.AppEvents();
+
+            m_GlobalHook.MouseDownExt += GlobalHookMouseDownExt;
+            m_GlobalHook.KeyPress += GlobalHookKeyPress;
+        }
+
+        private void GlobalHookKeyPress(object sender, KeyPressEventArgs e)
+        {
+            //Console.WriteLine("KeyPress: \t{0}", e.KeyChar);
+        }
+
+        private void GlobalHookMouseDownExt(object sender, MouseEventExtArgs e)
+        {
+            //Console.WriteLine("MouseDown: \t{0}; \t System Timestamp: \t{1}", e.Button, e.Timestamp);
+
+            lblXY.Text = "";
+
+            Point mousePoint = panKarte.PointToClient(Control.MousePosition);
+
+            if (e.Button == MouseButtons.Left)
+            {
+                foreach (Point p in dictPntOrt.Keys)
+                {
+                    if (Math.Abs(mousePoint.X - p.X) < 10 && Math.Abs(mousePoint.Y - p.Y) < 10)
+                    {
+                        lblXY.Text = dictPntOrt[p].ToString();
+                        lblXAnz.Text = mousePoint.X.ToString();
+                        lblYAnz.Text = mousePoint.Y.ToString();
+                    }
+                }
+            }
+        }
+
+        public void Unsubscribe()
+        {
+            m_GlobalHook.MouseDownExt -= GlobalHookMouseDownExt;
+            m_GlobalHook.KeyPress -= GlobalHookKeyPress;
+
+            //It is recommened to dispose it
+            m_GlobalHook.Dispose();
+        }
+
+        private void Main_Closing(object sender, CancelEventArgs e)
+        {
+            Unsubscribe();
+        }
 
         private void btnCSVLaden_Click(object sender, EventArgs e)
         {
@@ -67,21 +122,33 @@ namespace PAKarte
 
             foreach (HaltestellenDaten hlt in data)
             {
-                hx = (float)(pictureBox1.Width / (maxLaenge - minLaenge) * (hlt.Laenge - minLaenge));
-                hy = (float)(pictureBox1.Height - (pictureBox1.Height / (maxBreite - minBreite) * (hlt.Breite - minBreite)));
+                float paneSize = 5f;
 
-                Panel pane = new Panel();
-                pane.Size = new Size(5, 5);
-                pane.BorderStyle = BorderStyle.FixedSingle;
-                pane.Location = new Point((int)hx, (int)hy);
-                pictureBox1.Controls.Add(pane);
+                hx = (float)(panKarte.Width / (maxLaenge - minLaenge) * (hlt.Laenge - minLaenge)) - paneSize;
+                hy = (float)(panKarte.Height - (panKarte.Height / (maxBreite - minBreite) * (hlt.Breite - minBreite))) - paneSize;
+
                 if (hlt.isHbf(hlt.Name))
                 {
-                    pane.BackColor = Color.Yellow;
+                    Panel paneHbf = new Panel();
+                    paneHbf.Size = new Size((int)(1.5 * paneSize), (int)(1.5 * paneSize));
+                    paneHbf.BackColor = Color.Yellow;
+                    paneHbf.BorderStyle = BorderStyle.FixedSingle;
+                    paneHbf.Location = new Point((int)hx, (int)hy);
+                    panKarte.Controls.Add(paneHbf);
+                    paneHbf.BringToFront();
+                    Point p = new Point((int)hx, (int)hy);
+                    dictPntOrt[p] = hlt.Name;
                 }
                 else
                 {
+                    Panel pane = new Panel();
+                    pane.Size = new Size((int)paneSize, (int)paneSize);
                     pane.BackColor = Color.Black;
+                    pane.BorderStyle = BorderStyle.FixedSingle;
+                    pane.Location = new Point((int)hx, (int)hy);
+                    panKarte.Controls.Add(pane);
+
+                    pane.SendToBack();
                 }
             }
             btnZeichnen.Enabled = true;
@@ -97,6 +164,35 @@ namespace PAKarte
         private void frmHaltestellenKarte_FormClosing(object sender, FormClosingEventArgs e)
         {
             Application.Exit();
+        }
+
+        private void btnSpeichern_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog sfd = new SaveFileDialog()
+            {
+                Filter = "Image files(*.jpeg)|*.jpeg"
+            })
+            {
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    var file = new FileInfo(sfd.FileName);
+
+                    using (Bitmap bmp = new Bitmap(panKarte.Width, panKarte.Height))
+                    {
+                        panKarte.DrawToBitmap(bmp, panKarte.ClientRectangle);
+                        bmp.Save(file.FullName, ImageFormat.Jpeg);
+                        bmp.Dispose();
+                    }
+                }
+            }
+        }
+
+        private void panKarte_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point mousePoint = panKarte.PointToClient(Control.MousePosition);
+
+            lblXAnz.Text = mousePoint.X.ToString();
+            lblYAnz.Text = mousePoint.Y.ToString();
         }
 
         private void CSVLoad(object sender, DoWorkEventArgs e)
@@ -163,6 +259,7 @@ namespace PAKarte
                 lblProgress.Text = prgbLoad.Value.ToString() + "%";
             }
         }
+
     }
 }
 
